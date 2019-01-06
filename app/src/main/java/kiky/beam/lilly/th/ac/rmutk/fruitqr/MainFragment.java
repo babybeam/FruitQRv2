@@ -4,11 +4,17 @@ package kiky.beam.lilly.th.ac.rmutk.fruitqr;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 /**
@@ -43,6 +49,63 @@ public class MainFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                EditText userEditText = getView().findViewById(R.id.edtUser);
+                EditText passwordEditText = getView().findViewById(R.id.edtPassword);
+
+                String user = userEditText.getText().toString().trim();
+                String password = passwordEditText.getText().toString().trim();
+
+                MyAlertDialog myAlertDialog = new MyAlertDialog(getActivity());
+                if (user.isEmpty() || password.isEmpty()) {
+                    myAlertDialog.normalDialog("Have Space", "Plase Fill Every Blank");
+                } else {
+
+                 //   Check Authen
+                    try {
+
+                        Myconstant myconstant = new Myconstant();
+                        GetAllDataThread getAllDataThread = new GetAllDataThread(getActivity());
+                        getAllDataThread.execute(myconstant.getUrlGetAllData());
+
+                        String jsonString = getAllDataThread.get();
+                        Log.d("6janV1","json ==> " + jsonString);
+
+                        boolean b = true;
+                        String truePassword = null, name = null, surname = null;
+
+                        JSONArray jsonArray = new JSONArray(jsonString);
+                        for (int i=0; i<jsonArray.length(); i += 1){
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            if (user.equals(jsonObject.getString("User"))){
+                                b = false;
+                                truePassword = jsonObject.getString("Password");
+                                name = jsonObject.getString("Name");
+                                surname = jsonObject.getString("Surname");
+                            }
+                        }
+
+                        if (b){
+                            myAlertDialog.normalDialog("User False", "No This User in My Database");
+                        }else if (password.equals(truePassword)) {
+                            Toast.makeText(getActivity(),"Welcome"+name+""+surname,Toast.LENGTH_SHORT).show();;
+                        }else{
+                            myAlertDialog.normalDialog("Password False","Please Try Again Password False");
+
+                        }
+
+
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+
+                    }
+
+
+
+
+                }
+
 
             }
         });
