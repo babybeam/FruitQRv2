@@ -53,7 +53,8 @@ public class QRFragment extends Fragment implements ZXingScannerView.ResultHandl
     public void handleResult(Result result) {
         resuitQRcode = result.toString().trim();
         Log.d("6janV2","result ==> "+ resuitQRcode);
-        getActivity().finish();
+
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.contentQRFragment,DetailFragment.detailFragment(resuitQRcode)).commit();
 
         Handler handler = new Handler();
 
